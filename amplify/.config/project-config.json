@@ -1,0 +1,17 @@
+{
+    "projectName": "todo",
+    "version": "2.0",
+    "frontend": "javascript",
+    "javascript": {
+        "framework": "react-native",
+        "config": {
+            "SourceDir": "/",
+            "DistributionDir": "web-build",
+            "BuildCommand": "expo build:web",
+            "StartCommand": "expo start"
+        }
+    },
+    "providers": [
+        "awscloudformation"
+    ]
+}
