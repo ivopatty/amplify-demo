@@ -114,6 +114,7 @@ const createNewTodo = (state: ReducerState, dispatch: (action: any) => void) => 
   await API.graphql(graphqlOperation(                     // Talk to the AWS API
     createTodo,                                           // What AWS API to use?
     { input: todo }))                             // What Input to send
+    // @ts-ignore
     .then(() => dispatch({ type: CLEAR_NEW }));     // Clear the input of the user
 };
 
@@ -182,6 +183,7 @@ const ToDoList = () => {
 
     getData();
     // Subscribe to created ToDos
+    // @ts-ignore
     const subscription = API.graphql(graphqlOperation(onCreateTodo)).subscribe({
       next: (eventData) => {
         const todo = eventData.value.data.onCreateTodo;
@@ -189,6 +191,7 @@ const ToDoList = () => {
       },
     });
     // Subscribe to updated TODOs for real time checking
+    // @ts-ignore
     const updateSubscription = API.graphql(graphqlOperation(onUpdateTodo)).subscribe({
       next: (eventData) => {
         const todo = eventData.value.data.onUpdateTodo;
