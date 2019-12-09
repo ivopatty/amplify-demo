@@ -5,30 +5,9 @@ import { useEffect, useReducer } from 'react';
 import { ActivityIndicator, Button, LayoutAnimation, ScrollView, View } from 'react-native';
 import { Input, List, ListItem, Text } from 'react-native-ui-kitten';
 import { createTodo, updateTodo } from './graphql/mutations';
+import { listTodos } from './graphql/queries';
 import { onCreateTodo, onUpdateTodo } from './graphql/subscriptions';
 import Icon from 'react-native-vector-icons/FontAwesome'
-
-const listTodos = `query listTodos {
-  listTodos{
-    items{
-      id
-      completed
-      name
-      description
-    }
-  }
-}`;
-
-const addTodo = `mutation createTodo($name:String! $description: String!) {
-  createTodo(input:{
-    name:$name
-    description:$description
-  }){
-    id
-    name
-    description
-  }
-}`;
 
 // Action Types
 const QUERY = 'QUERY';
@@ -147,8 +126,8 @@ const ToDoList = () => {
    */
   useEffect(() => {
     async function getData(offset?: string) {
-      const todoData: any = await API.graphql(graphqlOperation(listTodos));
-      dispatch({ type: QUERY, todos: todoData.data.listTodos.items });
+      const todoData: any = await API.graphql(graphqlOperation(listTodos, {nextToken: offset}));
+      dispatch({ type: offset ? LOAD_MORE : QUERY, todos: todoData.data.listTodos.items });
       if (todoData.data.listTodos.nextToken) {
         await getData(todoData.data.listTodos.nextToken);
       }
