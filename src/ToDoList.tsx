@@ -47,6 +47,12 @@ const initialState: ReducerState = {
   newTitle: null,
 };
 
+
+/** Manage local state
+ *
+ * @param state     The current state
+ * @param action    The action to take on the state
+ */
 const reducer = (state, action): ReducerState => {
   switch (action.type) {
     case QUERY:
@@ -96,24 +102,49 @@ interface ReducerState {
   }>
 }
 
+/**
+ * Create a new Item
+ *
+ * @param state       What the user has entered
+ * @param dispatch    Dispatch that we've created a new item to the app
+ */
 const createNewTodo = (state: ReducerState, dispatch: (action: any) => void) => async () => {
   dispatch({ type: START_LOADING });
+  // convert the new Title, Image and Description to a new TODO
   const todo = { name: state.newTitle, description: state.newDescription };
-  await API.graphql(graphqlOperation(createTodo, { input: todo }))
-    .then(() => dispatch({ type: CLEAR_NEW }));
+  // Store the item in the API
+  await API.graphql(graphqlOperation(                     // Talk to the AWS API
+    createTodo,                                           // What AWS API to use?
+    { input: todo }))                             // What Input to send
+    .then(() => dispatch({ type: CLEAR_NEW }));     // Clear the input of the user
 };
 
+/**
+ * Update server item based on action fo user
+ *
+ * @param oldTodo     The current item
+ * @param completed   Mark item as done or clear status
+ */
 const updateCurrentTodo = async (oldTodo: any, completed: boolean) => {
   const todo = { ...oldTodo, completed };
-  await API.graphql(graphqlOperation(updateTodo, { input: todo }));
+  await API.graphql(graphqlOperation(                   // Talk to the AWS API again
+    updateTodo,                                         // What AWS API to use
+    { input: todo }));                          // Send the new TODO
 };
 
 
+/**
+ * View Logic
+ * This is where we render the component to show the list of TODOS
+ */
 const ToDoList = () => {
 
   // @ts-ignore
   const [state, dispatch] = useReducer<(state: ReducerState, action: any) => any, ReducerState>(reducer, initialState);
 
+  /**
+   * Get the data from the API
+   */
   useEffect(() => {
     async function getData(offset?: string) {
       const todoData: any = await API.graphql(graphqlOperation(listTodos));
@@ -122,26 +153,38 @@ const ToDoList = () => {
         await getData(todoData.data.listTodos.nextToken);
       }
     }
-
     getData();
+    // Subscribe to created ToDos
     const subscription = API.graphql(graphqlOperation(onCreateTodo)).subscribe({
       next: (eventData) => {
         const todo = eventData.value.data.onCreateTodo;
-        LayoutAnimation.easeInEaseOut();
         dispatch({ type: SUBSCRIPTION, todo });
       },
     });
+    // Subscribe to updated TODOs for real time checking
     const updateSubscription = API.graphql(graphqlOperation(onUpdateTodo)).subscribe({
       next: (eventData) => {
         const todo = eventData.value.data.onUpdateTodo;
-        LayoutAnimation.easeInEaseOut();
         dispatch({ type: UPDATE, todo });
       },
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      updateSubscription.unsubscribe()
+    }
   }, []);
 
+  const renderTodo = ({ item }: any) => {
+    return (<ListItem
+      title={`${item.name}`}
+      description={`${item.description}`}
+      descriptionStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
+      titleStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
+      icon={() => <Icon name={!item.completed ? 'circle' : 'check-circle'} style={{color: "#fff"}} size={25}/>}
+      onPress={() => updateCurrentTodo(item, !item.completed)}
+    />);
+  };
 
   return (
     <View>
@@ -155,17 +198,6 @@ const ToDoList = () => {
       <Button disabled={state.disabled} title={'Create ToDo'} onPress={createNewTodo(state, dispatch)}/>
     </View>
   );
-};
-
-const renderTodo = ({ item }: any) => {
-  return (<ListItem
-    title={`${item.name}`}
-    description={`${item.description}`}
-    descriptionStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
-    titleStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
-    icon={() => <Icon name={!item.completed ? 'circle' : 'check-circle'} style={{color: "#fff"}} size={25}/>}
-    onPress={() => updateCurrentTodo(item, !item.completed)}
-  />);
 };
 
 export default withAuthenticator(ToDoList, {
