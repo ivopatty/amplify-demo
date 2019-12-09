@@ -140,20 +140,31 @@ const ToDoList = () => {
   // @ts-ignore
   const [state, dispatch] = useReducer<(state: ReducerState, action: any) => any, ReducerState>(reducer, initialState);
 
+  /**
+   * IMAGE PICKER CODE
+   */
   const pickImage = async () => {
+    // Expo code to get image from user
     let result = await ImagePicker.launchImageLibraryAsync({
       base64: true,
       mediaTypes: ImagePicker.MediaTypeOptions.All,
     });
     if (result.cancelled === false) {
       const file = `${uuid()}.jpg`;
+      // Upload image to AWS
       await Storage.put(file, Buffer.from(result.uri.split(',')[1], 'base64'));
+      // END UPLOAD IMAGE TO AWS
       dispatch({ type: ADD_IMAGE, image: file });
     }
   };
 
+  /**
+   * Get a URL for the image from AWS
+   * @param uri   Which image to get?
+   */
   const getImage = async (uri: string) => {
     dispatch({ type: TOGGLE_MODAL });
+    // Get the image from AWS
     return Storage.get(uri).then(image => dispatch({ type: SET_IMAGE, image }));
   };
 
