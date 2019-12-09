@@ -2,5 +2,6 @@ type Todo @model {
   id: ID!
   name: String!
   completed: Boolean
+  image: String
   description: String
 }

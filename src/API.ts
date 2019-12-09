@@ -5,6 +5,7 @@ export type CreateTodoInput = {
   id?: string | null,
   name: string,
   completed?: boolean | null,
+  image?: string | null,
   description?: string | null,
 };
 
@@ -12,6 +13,7 @@ export type UpdateTodoInput = {
   id: string,
   name?: string | null,
   completed?: boolean | null,
+  image?: string | null,
   description?: string | null,
 };
 
@@ -23,6 +25,7 @@ export type ModelTodoFilterInput = {
   id?: ModelIDFilterInput | null,
   name?: ModelStringFilterInput | null,
   completed?: ModelBooleanFilterInput | null,
+  image?: ModelStringFilterInput | null,
   description?: ModelStringFilterInput | null,
   and?: Array< ModelTodoFilterInput | null > | null,
   or?: Array< ModelTodoFilterInput | null > | null,
@@ -70,6 +73,7 @@ export type CreateTodoMutation = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };
@@ -84,6 +88,7 @@ export type UpdateTodoMutation = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };
@@ -98,6 +103,7 @@ export type DeleteTodoMutation = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };
@@ -112,6 +118,7 @@ export type GetTodoQuery = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };
@@ -130,6 +137,7 @@ export type ListTodosQuery = {
       id: string,
       name: string,
       completed: boolean | null,
+      image: string | null,
       description: string | null,
     } | null > | null,
     nextToken: string | null,
@@ -142,6 +150,7 @@ export type OnCreateTodoSubscription = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };
@@ -152,6 +161,7 @@ export type OnUpdateTodoSubscription = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };
@@ -162,6 +172,7 @@ export type OnDeleteTodoSubscription = {
     id: string,
     name: string,
     completed: boolean | null,
+    image: string | null,
     description: string | null,
   } | null,
 };

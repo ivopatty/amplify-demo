@@ -6,6 +6,7 @@ export const getTodo = `query GetTodo($id: ID!) {
     id
     name
     completed
+    image
     description
   }
 }
@@ -20,6 +21,7 @@ export const listTodos = `query ListTodos(
       id
       name
       completed
+      image
       description
     }
     nextToken

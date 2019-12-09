@@ -6,6 +6,7 @@ export const onCreateTodo = `subscription OnCreateTodo {
     id
     name
     completed
+    image
     description
   }
 }
@@ -15,6 +16,7 @@ export const onUpdateTodo = `subscription OnUpdateTodo {
     id
     name
     completed
+    image
     description
   }
 }
@@ -24,6 +26,7 @@ export const onDeleteTodo = `subscription OnDeleteTodo {
     id
     name
     completed
+    image
     description
   }
 }

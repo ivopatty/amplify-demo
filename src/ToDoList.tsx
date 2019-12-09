@@ -1,9 +1,11 @@
-import { Icon, Input, List, ListItem, Text } from '@ui-kitten/components';
-import { API, graphqlOperation } from 'aws-amplify';
+import { Icon, Input, List, ListItem, Text, Button as Knop, Popover } from '@ui-kitten/components';
+import { API, graphqlOperation, Storage } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import * as React from 'react';
 import { useEffect, useReducer } from 'react';
-import { ActivityIndicator, Button, LayoutAnimation, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Button, Image, LayoutAnimation, Modal, ScrollView, View } from 'react-native';
+import uuid from 'uuid';
 import { createTodo, updateTodo } from './graphql/mutations';
 import { listTodos } from './graphql/queries';
 import { onCreateTodo, onUpdateTodo } from './graphql/subscriptions';
@@ -17,12 +19,18 @@ const START_LOADING = 'START_LOADING';
 const CLEAR_NEW = 'CLEAR_NEW';
 const SUBSCRIPTION = 'SUBSCRIPTION';
 const UPDATE = 'UPDATE';
+const ADD_IMAGE = 'ADD_IMAGE';
+const SET_IMAGE = 'SET_IMAGE';
+const TOGGLE_MODAL = 'TOGGLE_MODAL';
 
 const initialState: ReducerState = {
   todos: [],
   loading: false,
   newDescription: null,
   newTitle: null,
+  newImage: null,
+  currentImage: null,
+  modalOpen: false,
 };
 
 
@@ -33,6 +41,12 @@ const initialState: ReducerState = {
  */
 const reducer = (state, action): ReducerState => {
   switch (action.type) {
+    case TOGGLE_MODAL:
+      return { ...state, modalOpen: !state.modalOpen };
+    case SET_IMAGE:
+      const newState = { ...state, currentImage: action.image };
+      console.log(newState);
+      return newState;
     case QUERY:
       return { ...state, todos: action.todos };
     case LOAD_MORE:
@@ -44,8 +58,10 @@ const reducer = (state, action): ReducerState => {
       return { ...state, newDescription: action.description };
     case START_LOADING:
       return { ...state, loading: true };
+    case ADD_IMAGE:
+      return { ...state, newImage: action.image };
     case CLEAR_NEW:
-      return { ...state, loading: false, newTitle: null, newDescription: null };
+      return { ...state, loading: false, newTitle: null, newDescription: null, newImage: null };
     case SUBSCRIPTION:
       LayoutAnimation.spring();
       return { ...state, todos: [...state.todos, action.todo] };
@@ -72,6 +88,9 @@ const reducer = (state, action): ReducerState => {
 interface ReducerState {
   newTitle: string,
   newDescription: string,
+  newImage: string,
+  modalOpen: boolean,
+  currentImage: string,
   loading: boolean,
   todos: Array<{
     __typename: 'Todo',
@@ -90,7 +109,7 @@ interface ReducerState {
 const createNewTodo = (state: ReducerState, dispatch: (action: any) => void) => async () => {
   dispatch({ type: START_LOADING });
   // convert the new Title, Image and Description to a new TODO
-  const todo = { name: state.newTitle, description: state.newDescription };
+  const todo = { name: state.newTitle, description: state.newDescription, image: state.newImage };
   // Store the item in the API
   await API.graphql(graphqlOperation(                     // Talk to the AWS API
     createTodo,                                           // What AWS API to use?
@@ -120,6 +139,23 @@ const ToDoList = () => {
 
   // @ts-ignore
   const [state, dispatch] = useReducer<(state: ReducerState, action: any) => any, ReducerState>(reducer, initialState);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+    });
+    if (result.cancelled === false) {
+      const file = `${uuid()}.jpg`;
+      await Storage.put(file, Buffer.from(result.uri.split(',')[1], 'base64'));
+      dispatch({ type: ADD_IMAGE, image: file });
+    }
+  };
+
+  const getImage = async (uri: string) => {
+    dispatch({ type: TOGGLE_MODAL });
+    return Storage.get(uri).then(image => dispatch({ type: SET_IMAGE, image }));
+  };
 
   /**
    * Get the data from the API
@@ -162,6 +198,17 @@ const ToDoList = () => {
       descriptionStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
       titleStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
       icon={(style) => <Icon name={item.completed ? 'checkmark-circle-outline' : 'radio-button-off-outline'} {...style} size={25}/>}
+      accessory={() => item.image ?
+        <Popover
+          placement={'top'}
+          content={state.currentImage ?
+            <Image source={{ uri: state.currentImage }} style={{ height: 200, width: 200 }}/> : null}
+          onBackdropPress={() => dispatch({ type: TOGGLE_MODAL })} visible={state.modalOpen}
+        >
+          <Knop onPress={() => getImage(item.image)}
+                icon={() => <Icon name={'link'} size={20} style={{ color: '#fff' }}/>}/>
+        </Popover> :
+        <View/>}
       onPress={() => updateCurrentTodo(item, !item.completed)}
     />);
   };
@@ -175,6 +222,7 @@ const ToDoList = () => {
              onChangeText={(title) => dispatch({ title, type: SET_TITLE })}/>
       <Input placeholder={'Description'} editable={state.disabled} value={state.newDescription}
              onChangeText={(description) => dispatch({ description, type: SET_DESCRIPTION })}/>
+      <Button title={'Voeg foto toe'} onPress={pickImage}/>
       <Button disabled={state.disabled} title={'Create ToDo'} onPress={createNewTodo(state, dispatch)}/>
     </View>
   );
