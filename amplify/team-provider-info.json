@@ -1,19 +1,36 @@
 {
-	"demo": {
-		"awscloudformation": {
-			"AuthRoleName": "amplify-todo-demo-222928-authRole",
-			"UnauthRoleArn": "arn:aws:iam::074079974018:role/amplify-todo-demo-222928-unauthRole",
-			"AuthRoleArn": "arn:aws:iam::074079974018:role/amplify-todo-demo-222928-authRole",
-			"Region": "eu-central-1",
-			"DeploymentBucketName": "amplify-todo-demo-222928-deployment",
-			"UnauthRoleName": "amplify-todo-demo-222928-unauthRole",
-			"StackName": "amplify-todo-demo-222928",
-			"StackId": "arn:aws:cloudformation:eu-central-1:074079974018:stack/amplify-todo-demo-222928/fb7116b0-1aca-11ea-9d40-02433c861a1c"
-		},
-		"categories": {
-			"auth": {
-				"todo1ec25692": {}
-			}
-		}
-	}
+    "prd": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-todo-prd-152853-authRole",
+            "UnauthRoleArn": "arn:aws:iam::074079974018:role/amplify-todo-prd-152853-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::074079974018:role/amplify-todo-prd-152853-authRole",
+            "Region": "eu-central-1",
+            "DeploymentBucketName": "amplify-todo-prd-152853-deployment",
+            "UnauthRoleName": "amplify-todo-prd-152853-unauthRole",
+            "StackName": "amplify-todo-prd-152853",
+            "StackId": "arn:aws:cloudformation:eu-central-1:074079974018:stack/amplify-todo-prd-152853/647cc800-1b59-11ea-b8c8-0a80bebae0c0"
+        },
+        "categories": {
+            "auth": {
+                "todo1ec25692": {}
+            }
+        }
+    },
+    "demo": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-todo-demo-153524-authRole",
+            "UnauthRoleArn": "arn:aws:iam::074079974018:role/amplify-todo-demo-153524-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::074079974018:role/amplify-todo-demo-153524-authRole",
+            "Region": "eu-central-1",
+            "DeploymentBucketName": "amplify-todo-demo-153524-deployment",
+            "UnauthRoleName": "amplify-todo-demo-153524-unauthRole",
+            "StackName": "amplify-todo-demo-153524",
+            "StackId": "arn:aws:cloudformation:eu-central-1:074079974018:stack/amplify-todo-demo-153524/4d063340-1b5a-11ea-bd39-0647b6afc3d8"
+        },
+        "categories": {
+            "auth": {
+                "todo1ec25692": {}
+            }
+        }
+    }
 }
