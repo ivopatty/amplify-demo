@@ -220,7 +220,7 @@ const ToDoList = () => {
           onBackdropPress={() => dispatch({ type: TOGGLE_MODAL })} visible={state.modalOpen}
         >
           <Knop onPress={() => getImage(item.image)}
-                icon={() => <Icon name={'link'} size={20} style={{ color: '#fff' }}/>}/>
+                icon={(style) => <Icon name={'link'} size={20} {...style}/>}/>
         </Popover> :
         <View/>}
       onPress={() => updateCurrentTodo(item, !item.completed)}
@@ -236,7 +236,7 @@ const ToDoList = () => {
              onChangeText={(title) => dispatch({ title, type: SET_TITLE })}/>
       <Input placeholder={'Description'} editable={state.disabled} value={state.newDescription}
              onChangeText={(description) => dispatch({ description, type: SET_DESCRIPTION })}/>
-      <Button title={'Voeg foto toe'} onPress={pickImage}/>
+      <Button title={state.newImage ? '1 foto' : 'Voeg foto toe'} onPress={pickImage} disabled={state.newImage}/>
       <Button disabled={state.disabled} title={'Create ToDo'} onPress={createNewTodo(state, dispatch)}/>
     </View>
   );
