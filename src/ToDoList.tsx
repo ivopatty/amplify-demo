@@ -1,13 +1,12 @@
+import { Icon, Input, List, ListItem, Text } from '@ui-kitten/components';
 import { API, graphqlOperation } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
 import * as React from 'react';
 import { useEffect, useReducer } from 'react';
 import { ActivityIndicator, Button, LayoutAnimation, ScrollView, View } from 'react-native';
-import { Input, List, ListItem, Text } from 'react-native-ui-kitten';
 import { createTodo, updateTodo } from './graphql/mutations';
 import { listTodos } from './graphql/queries';
 import { onCreateTodo, onUpdateTodo } from './graphql/subscriptions';
-import Icon from 'react-native-vector-icons/FontAwesome'
 
 // Action Types
 const QUERY = 'QUERY';
@@ -37,6 +36,7 @@ const reducer = (state, action): ReducerState => {
     case QUERY:
       return { ...state, todos: action.todos };
     case LOAD_MORE:
+      LayoutAnimation.spring();
       return { ...state, todos: [...state.todos, ...action.todos] };
     case SET_TITLE:
       return { ...state, newTitle: action.title };
@@ -47,10 +47,10 @@ const reducer = (state, action): ReducerState => {
     case CLEAR_NEW:
       return { ...state, loading: false, newTitle: null, newDescription: null };
     case SUBSCRIPTION:
-      LayoutAnimation.easeInEaseOut();
+      LayoutAnimation.spring();
       return { ...state, todos: [...state.todos, action.todo] };
     case UPDATE:
-      LayoutAnimation.easeInEaseOut();
+      LayoutAnimation.spring();
       const currentIndex = state.todos.findIndex(record => record.id === action.todo.id);
       const r = state.todos.map((item, index) => {
         if (index !== currentIndex) {
@@ -132,6 +132,7 @@ const ToDoList = () => {
         await getData(todoData.data.listTodos.nextToken);
       }
     }
+
     getData();
     // Subscribe to created ToDos
     const subscription = API.graphql(graphqlOperation(onCreateTodo)).subscribe({
@@ -160,7 +161,7 @@ const ToDoList = () => {
       description={`${item.description}`}
       descriptionStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
       titleStyle={item.completed ? { textDecorationLine: 'line-through', textDecorationStyle: 'solid' } : {}}
-      icon={() => <Icon name={!item.completed ? 'circle' : 'check-circle'} style={{color: "#fff"}} size={25}/>}
+      icon={(style) => <Icon name={item.completed ? 'checkmark-circle-outline' : 'radio-button-off-outline'} {...style} size={25}/>}
       onPress={() => updateCurrentTodo(item, !item.completed)}
     />);
   };
