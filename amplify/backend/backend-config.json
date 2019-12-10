@@ -33,6 +33,10 @@
 		"s3f35bcb14": {
 			"service": "S3",
 			"providerPlugin": "awscloudformation"
+		},
+		"s367efe8d9": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
 		}
 	}
 }
